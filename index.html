@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech For Girls Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    @keyframes animatedBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(270deg, #f06292, #ba68c8, #4fc3f7);
+      background-size: 600% 600%;
+      animation: animatedBackground 15s ease infinite;
+      padding: 20px;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 450px;
+      background: #555873e6;
+      color: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ffccff;
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #ffddee;
+    }
+
+    input, select {
+      width: 95%;
+      padding: 8px 10px;
+      margin-top: 6px;
+      border: 1px solid #aaa;
+      border-radius: 10px;
+      background-color: #444;
+      color: #fff;
+      font-size: 13px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    input:hover, select:hover, input:focus {
+      border-color: #ff99cc;
+      box-shadow: 0 0 8px #ffbbdd;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(to right, #b44cd7, #ec6dfb);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: linear-gradient(to right, #9436bb, #d553f0);
+      transform: scale(1.05);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .message, .counter, .thankyou {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .counter {
+      color: #ff99cc;
+    }
+
+    .thankyou {
+      color: #a5ffa5;
+    }
+
+    /* Print Styling */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #thankyouMsg {
+        visibility: visible;
+        position: absolute;
+        top: 100px;
+        left: 100px;
+        font-size: 20px;
+        color: black;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Tech For Girls Registration</h2>
+    <form id="registrationForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Enter your full name" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="number" id="phone" placeholder="Enter your 10-digit phone number" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email address" required>
+
+      <label for="college">College/Department</label>
+      <input type="text" id="college" placeholder="Enter your college or department" required>
+
+      <label for="screenshot">Upload Screenshot</label>
+      <input type="file" id="screenshot" accept="image/*" required>
+
+      <div class="counter" id="counterText">Click count: 0/5</div>
+      <button type="button" id="shareBtn">Share on WhatsApp</button>
+
+      <div class="message" id="completionMsg"></div>
+      <button type="submit" id="submitBtn">Submit Registration</button>
+    </form>
+    <div class="thankyou" id="thankyouMsg" style="display:none">
+      🎉 Your submission has been recorded. Thanks for being part of Tech for Girls!
+    </div>
+  </div>
+
+  <script>
+    const shareBtn = document.getElementById('shareBtn');
+    const counterText = document.getElementById('counterText');
+    const completionMsg = document.getElementById('completionMsg');
+    const form = document.getElementById('registrationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const thankyouMsg = document.getElementById('thankyouMsg');
+
+    let shareCount = parseInt(localStorage.getItem('shareCount')) || 0;
+    const submitted = localStorage.getItem('submitted');
+
+    function updateCounter() {
+      counterText.textContent = `Click count: ${shareCount}/5`;
+      if (shareCount >= 5) {
+        completionMsg.textContent = "Sharing complete. Please continue.";
+      }
+    }
+
+    updateCounter();
+
+    if (submitted) {
+      form.querySelectorAll('input, button').forEach(el => el.disabled = true);
+      thankyouMsg.style.display = 'block';
+    }
+
+    shareBtn.addEventListener('click', () => {
+      if (shareCount >= 5) return;
+
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const college = document.getElementById('college').value;
+
+      if (!name || !phone || !email || !college) {
+        alert("Please fill all the fields before sharing.");
+        return;
+      }
+
+      if (phone.length !== 10) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
+      }
+
+      const message = encodeURIComponent("Hey Buddy, Join Tech For Girls Community!");
+      const url = `https://wa.me/?text=${message}`;
+      window.open(url, '_blank');
+      shareCount++;
+      localStorage.setItem('shareCount', shareCount);
+      updateCounter();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (shareCount < 5) {
+        alert("Please complete sharing 5 times before submitting.");
+        return;
+      }
+
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const college = document.getElementById('college').value;
+      const fileInput = document.getElementById('screenshot');
+      const file = fileInput.files[0];
+
+      if (phone.length !== 10) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function (event) {
+        const base64File = event.target.result.split(',')[1];
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("phone", phone);
+        formData.append("email", email);
+        formData.append("college", college);
+        formData.append("file", base64File); // send base64 string
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwHG_kGYmp7Ev6wjET-1DRjsX7apKR2pW5inlmpMwYK756CdZuj3H8cHM1Vg_x2qAQ/exec';
+
+        try {
+          await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', // ✅ Prevent CORS issues
+            body: formData
+          });
+
+          localStorage.setItem('submitted', true);
+          form.querySelectorAll('input, button').forEach(el => el.disabled = true);
+          thankyouMsg.style.display = 'block';
+
+          // Trigger print
+          setTimeout(() => {
+            window.print();
+          }, 500);
+
+        } catch (error) {
+          alert('Submission failed. Please try again.');
+          console.error(error);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
